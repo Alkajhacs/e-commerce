@@ -1,24 +1,22 @@
-import logo from './logo.svg';
+import Header from './components/Header';
+import Home from './components/Home';
+import Login from './components/Login';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
+
+//https://codesandbox.io/s/cleverprogrammersreact-challenge-amazon-clone-x35kd?file=/src/App.js
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route path="/e-commerce" element={<Home />}/>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
