@@ -1,3 +1,15 @@
-.padding_36{
-    padding: 36px;
+.padding_36 {
+  padding: 36px;
+}
+.fw_500 {
+  font-weight: 500;
+}
+
+.margin_36 {
+  margin: 36px;
+}
+
+.common_bg {
+  height: 100vh;
+  background: linear-gradient(to bottom, #4b9dd6, white);
 }

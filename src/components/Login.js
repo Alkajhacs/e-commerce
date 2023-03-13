@@ -2,18 +2,23 @@ import React, { Component } from "react";
 import "../styles/login.css";
 import "../styles/common.css";
 import axios from "axios";
+import {Link} from "react-router-dom";
+import { connect } from 'react-redux';
+import {updateAuthData } from "../actions/useractions";
 
-export default class Login extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
       userName: "",
       userPassword: "",
+      isauthenticated: false,
+      hasRole: ""
     };
   }
 
   handleLogin = () => {
-    const { userName = "", userPassword = "" } = this.state;
+    const { userName = "", userPassword = "", isauthenticated = false } = this.state;
     const data = JSON.stringify({
       userName,
       userPassword,
@@ -25,7 +30,21 @@ export default class Login extends Component {
         },
       })
       .then((response) => {
-        console.log(response.data);
+        const {token = "", result : {userRole = ""} = {}, auth = false} = response.data;
+        localStorage.setItem("token", token);
+        localStorage.setItem("role", userRole);
+        this.setState({
+          isauthenticated: auth,
+          hasRole: userRole
+        }, () => {
+          this.props.updateAuthData({
+            isauthenticated: auth,
+            hasRole: userRole
+          })
+          if(isauthenticated) {
+            this.props.history.push('/e-commerce');
+          }
+        })
       })
       .catch((error) => {
         console.log(error);
@@ -74,9 +93,17 @@ export default class Login extends Component {
                 Submit
               </button>
             </div>
+            <div className="button_wrap fw_500">If new user , Please &nbsp;<Link to= "/Signup"> Sign Up </Link></div>
           </div>
         </div>
       </div>
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateAuthData: (data) => dispatch(updateAuthData(data)),
+  };
+};
+export default connect(null, mapDispatchToProps)(Login);

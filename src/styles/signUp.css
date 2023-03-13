@@ -1,0 +1,14 @@
+.sign_up {
+    width: 70%;
+    background-color: white;
+    z-index: 1;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.3);
+}
+
+
+.signup_input {
+    height: 24px;
+    border-radius: 5px;
+    border: 1px solid;
+    width: 70%;
+}
