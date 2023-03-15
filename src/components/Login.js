@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import "../styles/login.css";
 import "../styles/common.css";
 import axios from "axios";
-import {Link} from "react-router-dom";
-import { connect } from 'react-redux';
-import {updateAuthData } from "../actions/useractions";
+import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { updateAuthData } from "../actions/useractions";
 
 class Login extends Component {
   constructor(props) {
@@ -13,12 +13,16 @@ class Login extends Component {
       userName: "",
       userPassword: "",
       isauthenticated: false,
-      hasRole: ""
+      userRole: "",
     };
   }
 
   handleLogin = () => {
-    const { userName = "", userPassword = "", isauthenticated = false } = this.state;
+    const {
+      userName = "",
+      userPassword = "",
+      isauthenticated = false,
+    } = this.state;
     const data = JSON.stringify({
       userName,
       userPassword,
@@ -30,21 +34,36 @@ class Login extends Component {
         },
       })
       .then((response) => {
-        const {token = "", result : {userRole = ""} = {}, auth = false} = response.data;
+        const {
+          token = "",
+          result: {
+            userRole = "",
+            userId = "",
+            userName = "",
+            userAddress = "",
+          } = {},
+          auth = false,
+        } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("role", userRole);
-        this.setState({
-          isauthenticated: auth,
-          hasRole: userRole
-        }, () => {
-          this.props.updateAuthData({
+        this.setState(
+          {
             isauthenticated: auth,
-            hasRole: userRole
-          })
-          if(isauthenticated) {
-            this.props.history.push('/e-commerce');
+            userRole: userRole
+          },
+          () => {
+            this.props.updateAuthData({
+              isauthenticated: auth,
+              userRole: userRole,
+              userId,
+              userName,
+              userAddress
+            });
+            if (isauthenticated) {
+              this.props.history.push("/e-commerce");
+            }
           }
-        })
+        );
       })
       .catch((error) => {
         console.log(error);
@@ -93,7 +112,9 @@ class Login extends Component {
                 Submit
               </button>
             </div>
-            <div className="button_wrap fw_500">If new user , Please &nbsp;<Link to= "/Signup"> Sign Up </Link></div>
+            <div className="button_wrap fw_500">
+              If new user , Please &nbsp;<Link to="/Signup"> Sign Up </Link>
+            </div>
           </div>
         </div>
       </div>

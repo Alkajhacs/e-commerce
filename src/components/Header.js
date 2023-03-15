@@ -3,22 +3,21 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Link } from "react-router-dom";
 import "../styles/header.css";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
 class Header extends Component {
-
   constructor(props) {
     super(props);
   }
 
   render() {
-    const { isauthenticated, hasRole } = this.props;
+    const { isauthenticated, userRole } = this.props;
     return (
       <div className="header">
         <img
           className="header__logo"
           src="http://pngimg.com/uploads/amazon/amazon_PNG11.png"
-          alt = ""
+          alt=""
         />
         <div className="header__search">
           <input className="header__searchInput" type="text" />
@@ -55,7 +54,10 @@ class Header extends Component {
 const mapStateToProps = (state) => {
   return {
     isauthenticated: state.isauthenticated,
-    hasRole: state.hasRole,
+    userRole: state.userRole,
+    userId: state.userId,
+    userName: state.userName,
+    userAddress: state.userAddress,
   };
 };
 

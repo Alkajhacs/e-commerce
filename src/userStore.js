@@ -1,15 +1,30 @@
-import { createStore } from 'redux';
+import { createStore } from "redux";
 
 const initialState = {
-    isauthenticated: false,
-    hasRole: ""
+  isauthenticated: false,
+  userRole: "",
+  userId: "",
+  userName: "",
+  userAddress: "",
 };
 
 function reducer(state = initialState, action) {
-  const {isauthenticated = false, userRole = ""} = action.payload || {};
+  const {
+    isauthenticated = false,
+    userRole = "",
+    userId = "",
+    userName = "",
+    userAddress = "",
+  } = action.payload || {};
   switch (action.type) {
-    case 'UPDATE_AUTH_DATA':
-      return { isauthenticated: isauthenticated, hasRole: userRole };
+    case "UPDATE_AUTH_DATA":
+      return {
+        isauthenticated: isauthenticated,
+        userRole: userRole,
+        userId,
+        userName,
+        userAddress,
+      };
     default:
       return state;
   }

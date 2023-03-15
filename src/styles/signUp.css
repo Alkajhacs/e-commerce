@@ -12,3 +12,10 @@
     border: 1px solid;
     width: 70%;
 }
+
+.signup_textarea {
+    border-radius: 5px;
+    border: 1px solid;
+    width: 70%;
+    height: 80px;
+}

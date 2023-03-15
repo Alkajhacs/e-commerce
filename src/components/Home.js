@@ -1,70 +1,118 @@
-import React, { Component } from 'react'
-import Product from './Product'
-import "../styles/home.css"
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import { withRouter } from "../withRouter";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import axios from "axios";
+import "../styles/home.css";
 
-export default class Home extends Component {
-    render() {
-        return (
-            <div className="home">
-            <div className="home__container">
-              <img
-                className="home__image"
-                src="https://images-eu.ssl-images-amazon.com/images/G/02/digital/video/merch2016/Hero/Covid19/Generic/GWBleedingHero_ENG_COVIDUPDATE__XSite_1500x600_PV_en-GB._CB428684220_.jpg"
-                alt=""
-              />
-      
-              <div className="home__row">
-                <Product
-                  id="12321341"
-                  title="The Lean Startup: How Constant Innovation Creates Radically Successful Businesses Paperback"
-                  price={11.96}
-                  rating={5}
-                  image="https://images-na.ssl-images-amazon.com/images/I/51Zymoq7UnL._SX325_BO1,204,203,200_.jpg"
-                />
-                <Product
-                  id="49538094"
-                  title="Kenwood kMix Stand Mixer for Baking, Stylish Kitchen Mixer with K-beater, Dough Hook and Whisk, 5 Litre Glass Bowl"
-                  price={239.0}
-                  rating={4}
-                  image="https://images-na.ssl-images-amazon.com/images/I/81O%2BGNdkzKL._AC_SX450_.jpg"
-                />
-              </div>
-      
-              <div className="home__row">
-                <Product
-                  id="4903850"
-                  title="Samsung LC49RG90SSUXEN 49' Curved LED Gaming Monitor"
-                  price={199.99}
-                  rating={3}
-                  image="https://images-na.ssl-images-amazon.com/images/I/71Swqqe7XAL._AC_SX466_.jpg"
-                />
-                <Product
-                  id="23445930"
-                  title="Amazon Echo (3rd generation) | Smart speaker with Alexa, Charcoal Fabric"
-                  price={98.99}
-                  rating={5}
-                  image="https://media.very.co.uk/i/very/P6LTG_SQ1_0000000071_CHARCOAL_SLf?$300x400_retinamobilex2$"
-                />
-                <Product
-                  id="3254354345"
-                  title="New Apple iPad Pro (12.9-inch, Wi-Fi, 128GB) - Silver (4th Generation)"
-                  price={598.99}
-                  rating={4}
-                  image="https://images-na.ssl-images-amazon.com/images/I/816ctt5WV5L._AC_SX385_.jpg"
-                />
-              </div>
-      
-              <div className="home__row">
-                <Product
-                  id="90829332"
-                  title="Samsung LC49RG90SSUXEN 49' Curved LED Gaming Monitor - Super Ultra Wide Dual WQHD 5120 x 1440"
-                  price={1094.98}
-                  rating={4}
-                  image="https://images-na.ssl-images-amazon.com/images/I/6125mFrzr6L._AC_SX355_.jpg"
-                />
-              </div>
-            </div>
-          </div>
-        )
+class Home extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      allProducts: [],
+    };
+  }
+  componentDidMount() {
+    this.fetchProducts();
+  }
+  fetchProducts() {
+    axios.get("http://localhost:8000/api/getProducts").then((response) => {
+      this.setState({
+        allProducts: response.data,
+      });
+    });
+  }
+
+  handleAdd(eachProduct) {
+    this.props.navigate("/productDetail", { state: eachProduct });
+  }
+
+  handleEdit(eachProduct) {
+    this.props.navigate("/addProduct", { state: {...eachProduct, isEdit: true} });
+  }
+
+  handleDelete(prdId) {
+    try {
+      const response = axios.delete(`http://localhost:8000/api/product/${prdId}`);
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
     }
+  }
+
+  render() {
+    const { allProducts = [] } = this.state;
+    return (
+      <div className="home">
+        <div className="home__container">
+          <img
+            className="home__image"
+            src="https://images-eu.ssl-images-amazon.com/images/G/02/digital/video/merch2016/Hero/Covid19/Generic/GWBleedingHero_ENG_COVIDUPDATE__XSite_1500x600_PV_en-GB._CB428684220_.jpg"
+            alt=""
+          />
+          <div className="button_wrap">
+            <button type="Submit" className="add_product">
+              <Link to="/addProduct">Add a Product</Link>
+            </button>
+          </div>
+          <div className="home__row">
+            {allProducts.map((eachProduct) => {
+              const {
+                category = "",
+                title = "",
+                discount = "",
+                imageUrl = "",
+                price = "",
+                rating = "",
+                prd_id = "",
+              } = eachProduct || {};
+              return (
+                <div className="product" key={prd_id}>
+                  <div className="product_in">
+                    <div className="product__info">
+                      <div className="text_cap fw_700">{category}</div>
+                      <hr></hr>
+                      <div> {title}</div>
+                      <div className="product__price">
+                        <div>
+                          <strike>₹{price}</strike>
+                          &nbsp;&nbsp;₹{price - price * (discount / 100)}
+                          &nbsp;&nbsp;<strong>(Discount {discount}%)</strong>
+                        </div>
+                      </div>
+                      <div className="product__rating">
+                        {Array(rating)
+                          .fill()
+                          .map((_, i) => (
+                            <p>🌟</p>
+                          ))}
+                      </div>
+                    </div>
+                    <img src={imageUrl} alt="" className="prd_img" />
+                    <button
+                      className="add_product"
+                      onClick={() => this.handleAdd(eachProduct)}
+                    >
+                      View Details
+                    </button>
+                    <div className="admin_button">
+                      <div className="product__rating cursor_pointer" onClick={() => this.handleEdit(eachProduct)}>
+                        Edit &nbsp;&nbsp;<EditIcon />
+                      </div>
+                      <div className="product__rating cursor_pointer" onClick={() => this.handleDelete(prd_id)}>
+                        Delete &nbsp;&nbsp;<DeleteIcon />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
+
+export default withRouter(Home);

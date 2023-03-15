@@ -17,7 +17,7 @@ class Signup extends Component {
       userAddress: "",
       userRole: "",
       isauthenticated: false,
-      hasRole: "",
+      userRole: "",
     };
   }
 
@@ -51,12 +51,12 @@ class Signup extends Component {
         this.setState(
           {
             isauthenticated: auth,
-            hasRole: role,
+            userRole: role,
           },
           () => {
             this.props.updateAuthData({
               isauthenticated: auth,
-              hasRole: role,
+              userRole: role,
             });
           }
         );

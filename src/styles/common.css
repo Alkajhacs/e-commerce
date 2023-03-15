@@ -5,6 +5,10 @@
   font-weight: 500;
 }
 
+.fw_700 {
+  font-weight: 700;
+}
+
 .margin_36 {
   margin: 36px;
 }
@@ -12,4 +16,49 @@
 .common_bg {
   height: 100vh;
   background: linear-gradient(to bottom, #4b9dd6, white);
+}
+
+.button_wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+  cursor: pointer;
+}
+
+.w-58 {
+  width: 58%;
+}
+
+.w_50 {
+  width: 50%;
+}
+
+.text_cap {
+  text-transform: capitalize;
+}
+
+.flex_justify_between {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bottom_button {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.h_fit {
+  height: fit-content;
+}
+
+.cursor_pointer {
+  cursor: pointer;
+}
+
+.white_bg {
+  background-color: white;
+}
+
+.yellow_bg {
+  background: #f0c14b;
 }
