@@ -1,0 +1,25 @@
+.prod_det {
+    background-color: white;
+    padding: 16px;
+    border: 1px solid #e2cfcf;
+    width: 45%;
+    min-height: 500px;
+    height: fit-content;
+}
+
+.brand {
+    border: 1px solid green;
+    background-color: #d2dfdb;
+    padding: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.small_button {
+  background-color: #f0c14b;
+  border-color: #a88734 #9c7e31 #846a29;
+  font-size: 18px;
+  padding:8px;
+  border-radius: 4px;
+  width: 50px;
+}
