@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { withRouter } from "../withRouter";
 import axios from "axios";
 import "../styles/product.css";
@@ -91,20 +90,27 @@ class Product extends Component {
     formData.append("file", event.target.files[0]);
     formData.append("upload_preset", "jtn4mpsz");
     const cloudname = "dgcciqtbn";
-    axios.post(`https://api.cloudinary.com/v1_1/${cloudname}/image/upload`, formData)
-    .then((response) => {
-      this.setState({
-        imageUrl: response.data.secure_url,
-        image: event.target.files[0].name
-      }, () => {
-        toast.success("Image uploaded successfully", {
-          autoClose: 3000
-        })
-        this.setState({
-          showToast: true
-        })
-      })
-    })
+    axios
+      .post(
+        `https://api.cloudinary.com/v1_1/${cloudname}/image/upload`,
+        formData
+      )
+      .then((response) => {
+        this.setState(
+          {
+            imageUrl: response.data.secure_url,
+            image: event.target.files[0].name,
+          },
+          () => {
+            toast.success("Image uploaded successfully", {
+              autoClose: 3000,
+            });
+            this.setState({
+              showToast: true,
+            });
+          }
+        );
+      });
   };
 
   handleUpdate = async () => {
@@ -296,20 +302,20 @@ class Product extends Component {
                 {isEdit ? "Edit Product" : "Add Product"}
               </button>
             </div>
-
-            <Link to="/e-commerce">
-              <div className="button_wrap">
-                <button
-                  type="Submit"
-                  className="login_button"
-                  onClick={() => {
-                    this.handleCancel();
-                  }}
-                >
-                  Close
-                </button>
-              </div>
-            </Link>
+            <div
+              className="button_wrap"
+              onClick={() => this.props.navigate("/e-commerce")}
+            >
+              <button
+                type="Submit"
+                className="login_button"
+                onClick={() => {
+                  this.handleCancel();
+                }}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       </div>

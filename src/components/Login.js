@@ -5,12 +5,13 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { updateAuthData } from "../actions/useractions";
+import { withRouter } from "../withRouter";
 
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userName: "",
+      userEmail: "",
       userPassword: "",
       isauthenticated: false,
       userRole: "",
@@ -19,12 +20,11 @@ class Login extends Component {
 
   handleLogin = () => {
     const {
-      userName = "",
-      userPassword = "",
-      isauthenticated = false,
+      userEmail = "",
+      userPassword = ""
     } = this.state;
     const data = JSON.stringify({
-      userName,
+      userEmail,
       userPassword,
     });
     axios
@@ -41,11 +41,13 @@ class Login extends Component {
             userId = "",
             userName = "",
             userAddress = "",
+            userEmail = ""
           } = {},
           auth = false,
         } = response.data;
         localStorage.setItem("token", token);
         localStorage.setItem("role", userRole);
+        localStorage.setItem("user_id", userId);
         this.setState(
           {
             isauthenticated: auth,
@@ -57,10 +59,12 @@ class Login extends Component {
               userRole: userRole,
               userId,
               userName,
-              userAddress
+              userAddress,
+              userEmail
             });
-            if (isauthenticated) {
-              this.props.history.push("/e-commerce");
+            if (auth) {
+              console.log("hello")
+              this.props.navigate("/e-commerce");
             }
           }
         );
@@ -71,7 +75,7 @@ class Login extends Component {
   };
 
   render() {
-    const { userName = "", userPassword = "" } = this.state;
+    const { userEmail = "", userPassword = "" } = this.state;
     return (
       <div className="login_bg">
         <div className="login">
@@ -80,9 +84,9 @@ class Login extends Component {
               Enter Email * :
               <input
                 className="text_input"
-                value={userName}
+                value={userEmail}
                 onChange={(event) =>
-                  this.setState({ userName: event.target.value })
+                  this.setState({ userEmail: event.target.value })
                 }
                 autoComplete="off"
                 required
@@ -127,4 +131,4 @@ const mapDispatchToProps = (dispatch) => {
     updateAuthData: (data) => dispatch(updateAuthData(data)),
   };
 };
-export default connect(null, mapDispatchToProps)(Login);
+export default withRouter(connect(null, mapDispatchToProps)(Login));

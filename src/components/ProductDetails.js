@@ -1,72 +1,136 @@
 import React, { Component } from "react";
 import { withRouter } from "../withRouter";
 import "../styles/productDetails.css";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
+import { setCartCount } from "../actions/useractions";
 import axios from "axios";
 
 class ProductDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cartCount: 0
+      cartCount: props.cartCount || 0,
+      currentPrdCount: 0,
+      prevCartCount: 0,
+      isAlreadyAdded: false,
+    };
+  }
+
+  componentDidMount() {
+    this.fetchCartItem();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps?.cartCount !== this.props.cartCount) {
+      this.setState({
+        cartCount: this.props.cartCount,
+      });
+    }
+  }
+
+  fetchCartItem() {
+    const userId = localStorage.getItem("user_id");
+    const { prd_id } = this.props.location.state || {};
+    if (userId) {
+      axios
+        .get(`http://localhost:8000/api/getcartItems/${userId}`)
+        .then((response) => {
+          const prevPrdCount = response.data.filter(
+            (el) => el.prd_id === prd_id
+          );
+          this.setState({
+            prevCartCount: prevPrdCount?.[0]?.quantity,
+            isAlreadyAdded: !!prevPrdCount?.length,
+          });
+        });
     }
   }
 
   handleAddProduct() {
-    const {cartCount = 0} = this.state;
-    this.setState({
-      cartCount: cartCount+1
-    }, ()=> {
-      this.addCart();
-    })
+    const { cartCount = 0, currentPrdCount = 0 } = this.state;
+    const isauthenticated = localStorage.getItem("token") || false;
+    if (isauthenticated) {
+      this.setState(
+        {
+          cartCount: cartCount + 1,
+          currentPrdCount: currentPrdCount + 1,
+        },
+        () => {
+          this.addCart();
+          this.props.setCartCount({
+            cartCount: this.state.cartCount,
+          });
+        }
+      );
+    } else {
+      this.props.navigate("/login");
+    }
   }
 
   handleDeleteProduct() {
-    const {cartCount = 0} = this.state;
-    this.setState({
-      cartCount: cartCount-1
-    }, ()=> {
-      this.addCart();
-    })
+    const { cartCount = 0, currentPrdCount = 0 } = this.state;
+    this.setState(
+      {
+        cartCount: cartCount - 1,
+        currentPrdCount: currentPrdCount - 1,
+      },
+      () => {
+        this.addCart();
+        this.props.setCartCount({
+          cartCount: this.state.cartCount,
+        });
+      }
+    );
   }
 
   handleBuyNow() {
-    this.props.navigate("/payment", { state: this.props.location.state });
+    const { currentPrdCount = 0 , prevCartCount = 0} = this.state;
+    this.props.navigate("/payment", {
+      state: {
+        allCartProducts: [{ ...this.props.location.state }],
+        currentPrdCount: currentPrdCount + prevCartCount || 1,
+      },
+    });
   }
 
   addCart() {
-    const {cartCount =0} = this.state;
-    const {userId = ""} = this.props;
-    const {prd_id} = this.props.location.state || {};
+    const {
+      currentPrdCount = 0,
+      prevCartCount = 0,
+      cartCount = 0,
+      isAlreadyAdded = false,
+    } = this.state;
+    const { userId = "" } = this.props;
+    const { prd_id } = this.props.location.state || {};
     let data = {};
-    if(cartCount > 1) {
-      data = JSON.stringify({quantity: cartCount});
+    if (currentPrdCount > 1 || prevCartCount || isAlreadyAdded) {
+      data = JSON.stringify({ quantity: prevCartCount + currentPrdCount });
       axios
-      .put(`http://localhost:8000/api/addCart/${prd_id}/${userId}`, data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+        .put(`http://localhost:8000/api/addCart/${prd_id}/${userId}`, data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     } else {
-      data = JSON.stringify({quantity: cartCount, prd_id, userId });
+      data = JSON.stringify({ quantity: cartCount, prd_id, userId });
       axios
-      .post("http://localhost:8000/api/addCart", data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+        .post("http://localhost:8000/api/addCart", data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   }
 
@@ -81,7 +145,7 @@ class ProductDetails extends Component {
       discount = 0,
       brand = "",
     } = this.props.location.state || {};
-    const {cartCount = 0} = this.state;
+    const { currentPrdCount = 0, prevCartCount = 0 } = this.state;
     return (
       <div className="padding_36 common_bg flex_justify_between">
         <img src={imageUrl} alt="" className="w_50 h_fit" />
@@ -108,33 +172,39 @@ class ProductDetails extends Component {
           </div>
           <div className="bottom_button">
             <div className="button_wrap">
-            {!!cartCount && <button
-                type="Submit"
-                className="small_button cursor_pointer"
-                onClick={() => {
-                  this.handleAddProduct();
-                }}
-              >
-                +
-              </button>}
+              {!!(currentPrdCount + prevCartCount) && (
+                <button
+                  type="Submit"
+                  className="small_button cursor_pointer"
+                  onClick={() => {
+                    this.handleAddProduct();
+                  }}
+                >
+                  +
+                </button>
+              )}
               <button
                 type="Submit"
-                className={`login_button cursor_pointer ${cartCount ? "white_bg" :  ""}`}
+                className={`login_button cursor_pointer ${
+                  currentPrdCount + prevCartCount ? "white_bg" : ""
+                }`}
                 onClick={() => {
                   this.handleAddProduct();
                 }}
               >
-                {cartCount || "Add Product to cart"}
+                {currentPrdCount + prevCartCount || "Add Product to cart"}
               </button>
-              {!!cartCount && <button
-                type="Submit"
-                className="small_button cursor_pointer"
-                onClick={() => {
-                  this.handleDeleteProduct();
-                }}
-              >
-                -
-              </button>}
+              {!!(currentPrdCount + prevCartCount) && (
+                <button
+                  type="Submit"
+                  className="small_button cursor_pointer"
+                  onClick={() => {
+                    this.handleDeleteProduct();
+                  }}
+                >
+                  -
+                </button>
+              )}
             </div>
             <div className="button_wrap">
               <button
@@ -161,7 +231,16 @@ const mapStateToProps = (state) => {
     userId: state.userId,
     userName: state.userName,
     userAddress: state.userAddress,
+    cartCount: state.cartCount,
   };
 };
 
-export default withRouter(connect(mapStateToProps)(ProductDetails));
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setCartCount: (data) => dispatch(setCartCount(data)),
+  };
+};
+
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(ProductDetails)
+);

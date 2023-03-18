@@ -24,15 +24,23 @@
 
 .header__searchInput{
     height: 12px;
-    padding: 10px;
+    padding: 20px;
     border: none;
     width: 100%;
 }
 
 .search__Icon {
     padding: 5px;
-    height: 22px !important;
+    height: 41px !important;
     background-color: #cd9042;
+    width: 34px !important;
+}
+
+.clear__Icon {
+    padding: 5px;
+    height: 41px !important;
+    margin-left: -24px;
+    width: 50px;
 }
 
 .header__nav {

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { withRouter } from "../withRouter";
+import {connect} from "react-redux"; 
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
@@ -10,11 +10,19 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      allProducts: [],
+      allProducts: props.allProducts?.length ? props.allProducts : []
     };
   }
   componentDidMount() {
     this.fetchProducts();
+  }
+
+  componentDidUpdate(prevProps) {
+    if(prevProps?.allProducts !== this.props?.allProducts){
+      this.setState({
+        allProducts: this.props.allProducts
+      })
+    }
   }
   fetchProducts() {
     axios.get("http://localhost:8000/api/getProducts").then((response) => {
@@ -22,6 +30,7 @@ class Home extends Component {
         allProducts: response.data,
       });
     });
+
   }
 
   handleAdd(eachProduct) {
@@ -43,6 +52,7 @@ class Home extends Component {
 
   render() {
     const { allProducts = [] } = this.state;
+    const {userRole = ""} = this.props;
     return (
       <div className="home">
         <div className="home__container">
@@ -51,11 +61,11 @@ class Home extends Component {
             src="https://images-eu.ssl-images-amazon.com/images/G/02/digital/video/merch2016/Hero/Covid19/Generic/GWBleedingHero_ENG_COVIDUPDATE__XSite_1500x600_PV_en-GB._CB428684220_.jpg"
             alt=""
           />
-          <div className="button_wrap">
-            <button type="Submit" className="add_product">
-              <Link to="/addProduct">Add a Product</Link>
+          {userRole === "Admin" && <div className="button_wrap">
+            <button type="Submit" className="add_product" onClick={() => this.props.navigate("/addProduct")}>
+              Add a Product
             </button>
-          </div>
+          </div>}
           <div className="home__row">
             {allProducts.map((eachProduct) => {
               const {
@@ -96,14 +106,14 @@ class Home extends Component {
                     >
                       View Details
                     </button>
-                    <div className="admin_button">
+                    {userRole === "Admin" && <div className="admin_button">
                       <div className="product__rating cursor_pointer" onClick={() => this.handleEdit(eachProduct)}>
                         Edit &nbsp;&nbsp;<EditIcon />
                       </div>
                       <div className="product__rating cursor_pointer" onClick={() => this.handleDelete(prd_id)}>
                         Delete &nbsp;&nbsp;<DeleteIcon />
                       </div>
-                    </div>
+                    </div>}
                   </div>
                 </div>
               );
@@ -114,5 +124,10 @@ class Home extends Component {
     );
   }
 }
-
-export default withRouter(Home);
+const mapStateToProps = (state) => {
+  return {
+    allProducts: state.allProducts,
+    userRole: state.userRole
+  };
+};
+export default withRouter(connect(mapStateToProps)(Home));

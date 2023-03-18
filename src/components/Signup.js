@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { updateAuthData } from "../actions/useractions";
+import { withRouter } from "../withRouter";
 import "../styles/common.css";
 import "../styles/signUp.css";
 
@@ -17,7 +18,6 @@ class Signup extends Component {
       userAddress: "",
       userRole: "",
       isauthenticated: false,
-      userRole: "",
     };
   }
 
@@ -167,20 +167,20 @@ class Signup extends Component {
                 User
               </div>
             </div>
-            <Link to="/e-commerce">
-              <div className="button_wrap">
-                <button
-                  type="Submit"
-                  className="login_button"
-                  onClick={() => {
-                    this.handleRegister();
-                  }}
-                >
-                  Submit
-                </button>
-              </div>
-            </Link>
-
+            <div
+              className="button_wrap"
+              onClick={() => this.props.navigate("/e-commerce")}
+            >
+              <button
+                type="Submit"
+                className="login_button"
+                onClick={() => {
+                  this.handleRegister();
+                }}
+              >
+                Submit
+              </button>
+            </div>
             <div className="button_wrap fw_500">
               If already have an account , Please &nbsp;
               <Link to="/login"> Sign In </Link>
@@ -197,4 +197,4 @@ const mapDispatchToProps = (dispatch) => {
     updateAuthData: (data) => dispatch(updateAuthData(data)),
   };
 };
-export default connect(null, mapDispatchToProps)(Signup);
+export default withRouter(connect(null, mapDispatchToProps)(Signup));
