@@ -1,0 +1,16 @@
+.outer_body {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  padding: 10px 20px;
+  margin: 20px 0px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), -2px -2px 4px rgba(0, 0, 0, 0.3);
+}
+.cart_img {
+    width: -webkit-fill-available;
+    margin-right: 24px;
+}
+
+.prod_det_body {
+    border: 1px solid black;
+    padding: 10px;
+}

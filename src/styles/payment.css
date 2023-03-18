@@ -1,0 +1,14 @@
+.mt_0 {
+    margin-top: 0px !important;
+}
+
+.payment_input{
+    display: flex;
+    align-items: center;
+    padding-bottom: 40px;
+    font-size: 18px;
+}
+
+.pl_16 {
+    padding-left: 16px;
+}
