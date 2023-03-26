@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { updateAuthData } from "../actions/useractions";
 import { withRouter } from "../withRouter";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 class Login extends Component {
   constructor(props) {
@@ -63,14 +65,18 @@ class Login extends Component {
               userEmail
             });
             if (auth) {
-              console.log("hello")
               this.props.navigate("/e-commerce");
             }
+            toast.success(response.data.message, {
+              autoClose: 3000,
+            });
           }
         );
       })
       .catch((error) => {
-        console.log(error);
+        toast.error(error, {
+          autoClose: 3000,
+        });
       });
   };
 
@@ -78,6 +84,7 @@ class Login extends Component {
     const { userEmail = "", userPassword = "" } = this.state;
     return (
       <div className="login_bg">
+        <ToastContainer/>
         <div className="login">
           <div className="padding_36">
             <div className="login_input">

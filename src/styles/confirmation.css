@@ -1,0 +1,15 @@
+.confirm_body {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.payment_det {
+    width: 70%;
+    padding: 20px;
+}
+
+.justify_center {
+    display: flex;
+    justify-content: center;
+}

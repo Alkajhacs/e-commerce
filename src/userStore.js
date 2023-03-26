@@ -10,7 +10,8 @@ function fetchUserData() {
       .get(`http://localhost:8000/api/getuser/${userId}`)
       .then((response) => {
         userData = response.data
-        const { user_mail = "", user_name = "", address = "", user_role = "" } = userData || {};
+        const { user_mail = "", user_name = "", address = "", user_role = "", phone_no = ""} = userData || {};
+        console.log(phone_no, "phone_no")
         const initialState = {
           isauthenticated: false,
           userRole: user_role,
@@ -19,7 +20,8 @@ function fetchUserData() {
           userAddress: address,
           allProducts: [],
           cartCount: 0,
-          userEmail: user_mail
+          userEmail: user_mail,
+          phoneNumber: phone_no
         };
         userStore.dispatch({ type: "UPDATE_AUTH_DATA", payload: initialState });
       })
@@ -51,7 +53,8 @@ function reducer(state = initialState, action) {
     userAddress = "",
     allProducts = [],
     cartCount = 0,
-    userEmail = ""
+    userEmail = "",
+    phoneNumber = ""
   } = action.payload || {};
   switch (action.type) {
     case "UPDATE_AUTH_DATA":
@@ -62,7 +65,8 @@ function reducer(state = initialState, action) {
         userId,
         userName,
         userAddress,
-        userEmail
+        userEmail,
+        phoneNumber
       };
     case "GET_SEARCH_DATA":
       return {

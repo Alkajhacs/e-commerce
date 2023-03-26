@@ -1,14 +1,23 @@
-
-import React from 'react';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import React from "react";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 
 function DialogBox(props) {
-  const {buttonText = "", title = "", content = "", showCancel = "", confirmButtonText = "", handleClose = () => {}, handleConfirm = ()=> {}, handleClickOpen = () => {}, showConfirmDialog = false} = props;
+  const {
+    buttonText = "",
+    title = "",
+    content = "",
+    showCancel = "",
+    confirmButtonText = "",
+    handleClose = () => {},
+    handleConfirm = () => {},
+    showConfirmDialog = false,
+    totalPrice = 0
+  } = props;
 
   return (
     <div>
@@ -26,11 +35,11 @@ function DialogBox(props) {
         </DialogContent>
         <DialogActions>
           {showCancel && (
-            <Button onClick={handleClose} color="primary">
+            <Button onClick={() => {handleClose()}} color="primary">
               Cancel
             </Button>
           )}
-          <Button onClick={handleConfirm} color="primary" autoFocus>
+          <Button onClick={() => handleConfirm(totalPrice)} color="primary" autoFocus>
             {confirmButtonText}
           </Button>
         </DialogActions>
@@ -40,5 +49,3 @@ function DialogBox(props) {
 }
 
 export default DialogBox;
-
-

@@ -84,13 +84,18 @@ class ProductDetails extends Component {
   }
 
   handleBuyNow() {
-    const { currentPrdCount = 0 , prevCartCount = 0} = this.state;
-    this.props.navigate("/payment", {
-      state: {
-        allCartProducts: [{ ...this.props.location.state }],
-        currentPrdCount: currentPrdCount + prevCartCount || 1,
-      },
-    });
+    const { currentPrdCount = 0, prevCartCount = 0 } = this.state;
+    const isauthenticated = localStorage.getItem("token") || false;
+    if (isauthenticated) {
+      this.props.navigate("/payment", {
+        state: {
+          allCartProducts: [{ ...this.props.location.state }],
+          currentPrdCount: currentPrdCount + prevCartCount || 1,
+        },
+      });
+    } else {
+      this.props.navigate("/login");
+    }
   }
 
   addCart() {

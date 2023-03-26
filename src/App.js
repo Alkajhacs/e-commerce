@@ -9,6 +9,10 @@ import './App.css';
 import ProductDetails from './components/ProductDetails';
 import CartDetails from './components/CartDetails';
 import ConfirmationPage from './components/ConfirmationPage';
+import Feedback from './components/Feedback';
+import MyProfile from './components/MyProfile';
+import AllUsers from './components/AllUsers';
+import Orders from './components/Orders';
 
 //https://codesandbox.io/s/cleverprogrammersreact-challenge-amazon-clone-x35kd?file=/src/App.js
 //Alka@123
@@ -27,7 +31,11 @@ function App() {
           <Route path='/productDetail' element={<ProductDetails/>}/>
           <Route path='/payment' element={<PaymentPage/>}/>
           <Route path= '/cartDetails'element = {<CartDetails/>}/>
-          <Route path= '/confirmation' element = {<ConfirmationPage/>}/>
+          <Route path= '/confimationPage' element = {<ConfirmationPage/>}/>
+          <Route path= '/myProfile' element = {<MyProfile/>}/>
+          <Route path= '/feedback' element = {<Feedback/>}/>
+          <Route path= '/allUsers' element = {<AllUsers/>}/>
+          <Route path= '/allOrders' element = {<Orders/>}/>
         </Routes>
       </div>
     </Router>

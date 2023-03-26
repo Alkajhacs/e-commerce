@@ -150,25 +150,61 @@ class Header extends Component {
               )}
             </span>
           </div>
-          <div className="header__option">
-            <span className="header__optionLineOne cursor_pointer">
-              Returns
-            </span>
-            <span className="header__optionLineTwo cursor_pointer">
-              {" "}
-              Orders
-            </span>
+          <div
+            className="header__option cursor_pointer"
+            onClick={() => this.props.navigate("/allOrders")}
+          >
+            Orders
           </div>
           <div
             className="header__optionBasket cursor_pointer"
             onClick={() => {
-              this.props.navigate("/cartDetails");
+              const isauthenticated = localStorage.getItem("token") || false;
+              if (isauthenticated) {
+                this.props.navigate("/cartDetails");
+              } else {
+                this.props.navigate("/login");
+              }
             }}
           >
             <ShoppingBasketIcon />
             <span className="header__optionLineTwo header__BasketCount">
               {cartCount}
             </span>
+          </div>
+          <div
+            className="header__option cursor_pointer"
+            onClick={() => {
+              const isauthenticated = localStorage.getItem("token") || false;
+              if (isauthenticated) {
+                this.props.navigate("/myProfile", {
+                  state: { fromPage: "header" },
+                });
+              } else {
+                this.props.navigate("/login");
+              }
+            }}
+          >
+            My Profile
+          </div>
+          <div
+            className="header__option cursor_pointer"
+            onClick={() => {
+              const isauthenticated = localStorage.getItem("token") || false;
+              if (isauthenticated) {
+                this.props.navigate("/feedback");
+              } else {
+                this.props.navigate("/login");
+              }
+            }}
+          >
+            Feedback
+          </div>
+          <div
+            className="header__option cursor_pointer"
+            onClick={() => this.props.navigate("/allUsers")}
+          >
+            All Users
           </div>
         </div>
       </div>

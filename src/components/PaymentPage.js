@@ -6,6 +6,7 @@ import "../styles/payment.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { setCartCount } from "../actions/useractions";
 
 class PaymentPage extends Component {
   constructor(props) {
@@ -27,10 +28,10 @@ class PaymentPage extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if(prevProps.userAddress !== this.props.userAddress){
+    if (prevProps.userAddress !== this.props.userAddress) {
       this.setState({
-        userAddress: this.props.userAddress
-      })
+        userAddress: this.props.userAddress,
+      });
     }
   }
 
@@ -87,11 +88,75 @@ class PaymentPage extends Component {
       });
   }
 
-  handleConfirm = () => {
-    this.setState({
-      showConfirmDialog: false,
-    }, () => {
-      this.props.navigate("/confimationPage")
+  handleConfirm = (totalPrice = 0) => {
+    const { allCartProducts = [], eachProdQuant = {} } = this.props.location.state;
+    this.setState(
+      {
+        showConfirmDialog: false,
+      },
+      () => {
+        console.log(totalPrice);
+        const { userAddress = "" } = this.state;
+        const userId = localStorage.getItem("user_id") || "";
+        const orderData = JSON.stringify({
+          userOrdId: userId,
+          totalPrice,
+          orderStatus: "Confirmed",
+          deliveryAddress: userAddress,
+        });
+        axios
+          .post("http://localhost:8000/api/order", orderData, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+          .then((response) => {
+            this.setEachOrderDetail(response.data.orderId);
+          });
+        this.props.navigate("/confimationPage", { state: { allCartProducts, eachProdQuant } });
+      }
+    );
+  };
+
+  setEachOrderDetail(orderId = "") {
+    const {
+      allCartProducts = [],
+      fromPage = "",
+      eachProdQuant = {},
+      currentPrdCount = 0,
+    } = this.props.location.state;
+    const userId = localStorage.getItem("user_id");
+    allCartProducts.map((el) => {
+      const { prd_id = "", price } = el;
+      const quantity =
+        fromPage === "cartDetail" ? eachProdQuant?.[prd_id] : currentPrdCount;
+      const orderItems = JSON.stringify({
+        orderId,
+        prodId: prd_id,
+        quantity,
+        pricePerItem: price,
+      });
+      axios
+        .post("http://localhost:8000/api/order_items", orderItems, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => {
+          axios
+            .delete(`http://localhost:8000/api/cart/${prd_id}/${userId}`)
+            .then(() => {
+              this.props.setCartCount({
+                cartCount: this.props.cartCount - quantity,
+              });
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          toast.success(response.data, {
+            autoClose: 3000,
+          });
+        });
     });
   }
 
@@ -128,7 +193,7 @@ class PaymentPage extends Component {
               fromPage === "cartDetail"
                 ? eachProdQuant?.[prd_id]
                 : currentPrdCount;
-                totalPrice += ((price - price * (discount / 100)) * quantity) 
+            totalPrice += (price - price * (discount / 100)) * quantity;
             return (
               <div>
                 <strong>Ordered Item</strong>
@@ -270,10 +335,11 @@ class PaymentPage extends Component {
             showConfirmDialog={showConfirmDialog}
             handleClose={this.handleClose}
             title="Confirm payment"
-            content= {`Do you want to confirm your payment of Rs ${totalPrice}`}
+            content={`Do you want to confirm your payment of Rs ${totalPrice}`}
             showCancel={true}
             confirmButtonText="Confirm"
             handleConfirm={this.handleConfirm}
+            totalPrice={totalPrice}
           />
         )}
       </div>
@@ -286,4 +352,13 @@ const mapStateToProps = (state) => {
     userAddress: state.userAddress,
   };
 };
-export default withRouter(connect(mapStateToProps)(PaymentPage));
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setCartCount: (data) => dispatch(setCartCount(data)),
+  };
+};
+
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(PaymentPage)
+);

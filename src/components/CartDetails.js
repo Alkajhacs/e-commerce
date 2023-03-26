@@ -217,11 +217,11 @@ class CartDetails extends Component {
             </div>
           );
         })}
-        <div className="button_wrap">
+        {allCartProducts.length ? <div className="button_wrap">
           <button className="add_product " onClick={() => {this.buyNow()}}>
             Buy Now
           </button>
-        </div>
+        </div> : <div>No Product is added to Cart</div>}
       </div>
     );
   }

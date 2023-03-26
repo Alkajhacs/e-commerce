@@ -59,30 +59,43 @@ class Product extends Component {
       discount,
       brand,
     });
-    axios
-      .post("http://localhost:8000/api/addProduct", data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        toast.success(response.data, {
-          autoClose: 3000,
+    if (
+      category !== "" &&
+      description !== "" &&
+      price !== 0 &&
+      imageUrl !== "" &&
+      title !== "" &&
+      brand !== ""
+    ) {
+      axios
+        .post("http://localhost:8000/api/addProduct", data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => {
+          console.log(response.data);
+          toast.success(response.data, {
+            autoClose: 3000,
+          });
+          this.setState({
+            showToast: true,
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          toast.error(error, {
+            autoClose: 3000,
+          });
+          this.setState({
+            showToast: true,
+          });
         });
-        this.setState({
-          showToast: true,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        toast.error(error, {
-          autoClose: 3000,
-        });
-        this.setState({
-          showToast: true,
-        });
+    } else {
+      toast.warning("Please enter all the mandatory field !", {
+        autoClose: 3000,
       });
+    }
   };
 
   handleImageUpload = (event) => {
@@ -257,7 +270,7 @@ class Product extends Component {
               ></input>
             </div>
             <div className="login_input">
-              Enter Discount * :
+              Enter Discount :
               <input
                 className="signup_input"
                 value={discount}
@@ -265,11 +278,10 @@ class Product extends Component {
                   this.setState({ discount: event.target.value })
                 }
                 autoComplete="off"
-                required
               ></input>
             </div>
             <div className="login_input">
-              Enter rating * :
+              Enter rating :
               <input
                 className="signup_input"
                 type="text"
@@ -278,7 +290,6 @@ class Product extends Component {
                   this.setState({ rating: event.target.value })
                 }
                 autoComplete="off"
-                required
               ></input>
             </div>
             <div className="login_input">

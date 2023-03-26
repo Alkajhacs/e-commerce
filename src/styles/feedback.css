@@ -1,0 +1,25 @@
+.width_body {
+    width: 550px;
+    height: 400px;
+}
+
+.feedback_msg {
+    margin: 20px 0px;
+    height: 154px;
+}
+
+.text_center {
+    text-align: center;
+}
+
+.mt_50 {
+    margin-top: 50px;
+}
+
+.mt_10 {
+    margin-top: 10px;
+}
+
+.tex_webkit_center {
+    text-align: -webkit-center;
+}
