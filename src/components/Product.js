@@ -74,7 +74,6 @@ class Product extends Component {
           },
         })
         .then((response) => {
-          console.log(response.data);
           toast.success(response.data, {
             autoClose: 3000,
           });
@@ -83,7 +82,6 @@ class Product extends Component {
           });
         })
         .catch((error) => {
-          console.log(error);
           toast.error(error, {
             autoClose: 3000,
           });
@@ -157,7 +155,6 @@ class Product extends Component {
         },
       })
       .then((response) => {
-        console.log(response.data);
         toast.success(response.data, {
           autoClose: 3000,
         });
@@ -166,7 +163,6 @@ class Product extends Component {
         });
       })
       .catch((error) => {
-        console.log(error);
         toast.error(error, {
           autoClose: 3000,
         });
@@ -270,7 +266,7 @@ class Product extends Component {
               ></input>
             </div>
             <div className="login_input">
-              Enter Discount :
+              Enter Discount (in %):
               <input
                 className="signup_input"
                 value={discount}
@@ -305,7 +301,7 @@ class Product extends Component {
             <div className="button_wrap">
               <button
                 type="Submit"
-                className="login_button"
+                className="login_button cursor_pointer"
                 onClick={() => {
                   isEdit ? this.handleUpdate() : this.handleAddProduct();
                 }}
@@ -319,7 +315,7 @@ class Product extends Component {
             >
               <button
                 type="Submit"
-                className="login_button"
+                className="login_button cursor_pointer"
                 onClick={() => {
                   this.handleCancel();
                 }}

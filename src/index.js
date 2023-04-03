@@ -9,9 +9,7 @@ import userStore from "./userStore";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={userStore}>
-    <React.StrictMode>
       <App />
-    </React.StrictMode>
   </Provider>
 );
 

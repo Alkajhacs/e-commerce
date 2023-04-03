@@ -4,6 +4,7 @@ import "../styles/myProfile.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import  {fetchUserData, validateEmail, validatePhonenumber}  from "../actions/commonFunctions";
 
 class MyProfile extends Component {
   constructor(props) {
@@ -37,28 +38,73 @@ class MyProfile extends Component {
       statePhoneNumber = "",
       stateUserAddress = "",
     } = this.state;
+    const {
+      userName = "",
+      userAddress = "",
+      phoneNumber = "",
+      userEmail = "",
+    } = this.props;
     const data = JSON.stringify({
       stateUserName,
       stateUserEmail,
       statePhoneNumber,
       stateUserAddress,
     });
-    axios
-      .put(`http://localhost:8000/api/setuser/${userId}`, data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        toast.success(response.data, {
-          autoClose: 3000,
-        });
-      })
-      .catch((error) => {
-        toast.error(error, {
-          autoClose: 3000,
-        });
+    if (stateUserName === "") {
+      toast.error("Pease enter Name", {
+        autoClose: 2000,
       });
+    } else if (stateUserEmail === "") {
+      toast.error("Pease enter Email", {
+        autoClose: 2000,
+      });
+    } else if (statePhoneNumber === "") {
+      toast.error("Pease enter Phone Number", {
+        autoClose: 2000,
+      });
+    } else if (stateUserAddress === "") {
+      toast.error("Pease enter Address", {
+        autoClose: 2000,
+      });
+    } else if(!validateEmail(stateUserEmail)) {
+      toast.error("Pease enter valid Email", {
+        autoClose: 2000,
+      });
+    }else if(!validatePhonenumber(statePhoneNumber)) {
+      toast.error("Pease enter valid Phone Number", {
+        autoClose: 2000,
+      });
+    } else if (
+      stateUserName !== userName ||
+      stateUserEmail !== userEmail ||
+      stateUserAddress !== userAddress ||
+      statePhoneNumber !== phoneNumber
+    ) {
+      axios
+        .put(`http://localhost:8000/api/setuser/${userId}`, data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => {
+          this.setState({
+            isEdit: false
+          })
+          toast.success(response.data, {
+            autoClose: 3000,
+          });
+          fetchUserData()
+        })
+        .catch((error) => {
+          toast.error(error, {
+            autoClose: 3000,
+          });
+        });
+    } else {
+      this.setState({
+        isEdit: false
+      })
+    }
   }
 
   render() {
@@ -79,7 +125,9 @@ class MyProfile extends Component {
               value={stateUserName}
               className="ml_16 padding_5"
               disabled={!isEdit}
-              onChange= {(event) => this.setState({stateUserName: event.target.value})}
+              onChange={(event) =>
+                this.setState({ stateUserName: event.target.value })
+              }
             />
           </div>
           <br />
@@ -89,7 +137,9 @@ class MyProfile extends Component {
               value={stateUserEmail}
               className="ml_16 padding_5"
               disabled={!isEdit}
-              onChange= {(event) => this.setState({stateUserEmail: event.target.value})}
+              onChange={(event) =>
+                this.setState({ stateUserEmail: event.target.value })
+              }
             />
           </div>
           <br />
@@ -99,7 +149,9 @@ class MyProfile extends Component {
               value={statePhoneNumber}
               className="ml_16 padding_5"
               disabled={!isEdit}
-              onChange= {(event) => this.setState({statePhoneNumber: event.target.value})}
+              onChange={(event) =>
+                this.setState({ statePhoneNumber: event.target.value })
+              }
             />
           </div>
           <br />
@@ -109,7 +161,9 @@ class MyProfile extends Component {
               value={stateUserAddress}
               className="ml_16 padding_5"
               disabled={!isEdit}
-              onChange= {(event) => this.setState({stateUserAddress: event.target.value})}
+              onChange={(event) =>
+                this.setState({ stateUserAddress: event.target.value })
+              }
             />
           </div>
           {!isEdit && (

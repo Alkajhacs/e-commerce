@@ -8,7 +8,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 
 function DialogBox(props) {
   const {
-    buttonText = "",
     title = "",
     content = "",
     showCancel = "",
@@ -16,7 +15,7 @@ function DialogBox(props) {
     handleClose = () => {},
     handleConfirm = () => {},
     showConfirmDialog = false,
-    totalPrice = 0
+    confirmParam = ""
   } = props;
 
   return (
@@ -39,7 +38,7 @@ function DialogBox(props) {
               Cancel
             </Button>
           )}
-          <Button onClick={() => handleConfirm(totalPrice)} color="primary" autoFocus>
+          <Button onClick={() => handleConfirm(confirmParam)} color="primary" autoFocus>
             {confirmButtonText}
           </Button>
         </DialogActions>

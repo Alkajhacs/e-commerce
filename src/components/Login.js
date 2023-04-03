@@ -8,6 +8,7 @@ import { updateAuthData } from "../actions/useractions";
 import { withRouter } from "../withRouter";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { validateEmail } from "../actions/commonFunctions";
 
 class Login extends Component {
   constructor(props) {
@@ -21,70 +22,83 @@ class Login extends Component {
   }
 
   handleLogin = () => {
-    const {
-      userEmail = "",
-      userPassword = ""
-    } = this.state;
+    const { userEmail = "", userPassword = "" } = this.state;
     const data = JSON.stringify({
       userEmail,
       userPassword,
     });
-    axios
-      .post("http://localhost:8000/api/login", data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        const {
-          token = "",
-          result: {
-            userRole = "",
-            userId = "",
-            userName = "",
-            userAddress = "",
-            userEmail = ""
-          } = {},
-          auth = false,
-        } = response.data;
-        localStorage.setItem("token", token);
-        localStorage.setItem("role", userRole);
-        localStorage.setItem("user_id", userId);
-        this.setState(
-          {
-            isauthenticated: auth,
-            userRole: userRole
+    if (userEmail === "") {
+      toast.error("Please Enter Email", {
+        autoClose: 2000,
+      });
+    } else if (userPassword === "") {
+      toast.error("Please Enter Password", {
+        autoClose: 2000,
+      });
+    } else if (!validateEmail(userEmail)) {
+      toast.error("Please Enter valid Email", {
+        autoClose: 2000,
+      });
+    } else {
+      axios
+        .post("http://localhost:8000/api/login", data, {
+          headers: {
+            "Content-Type": "application/json",
           },
-          () => {
-            this.props.updateAuthData({
+        })
+        .then((response) => {
+          const {
+            token = "",
+            result: {
+              userRole = "",
+              userId = "",
+              userName = "",
+              userAddress = "",
+              userEmail = "",
+              userPhonNo = "",
+            } = {},
+            auth = false,
+          } = response.data;
+          localStorage.setItem("token", token);
+          localStorage.setItem("role", userRole);
+          localStorage.setItem("user_id", userId);
+          this.setState(
+            {
               isauthenticated: auth,
               userRole: userRole,
-              userId,
-              userName,
-              userAddress,
-              userEmail
-            });
-            if (auth) {
-              this.props.navigate("/e-commerce");
+            },
+            () => {
+              this.props.updateAuthData({
+                isauthenticated: auth,
+                userRole: userRole,
+                userId,
+                userName,
+                userAddress,
+                userEmail,
+                phoneNumber: userPhonNo,
+              });
+              if (auth) {
+                this.props.navigate("/e-commerce");
+              }
+              toast.success(response.data.message, {
+                autoClose: 3000,
+              });
             }
-            toast.success(response.data.message, {
-              autoClose: 3000,
-            });
-          }
-        );
-      })
-      .catch((error) => {
-        toast.error(error, {
-          autoClose: 3000,
+          );
+        })
+        .catch((error) => {
+          toast.error(error, {
+            autoClose: 3000,
+          });
         });
-      });
+    }
   };
 
   render() {
     const { userEmail = "", userPassword = "" } = this.state;
     return (
       <div className="login_bg">
-        <ToastContainer/>
+        <ToastContainer />
         <div className="login">
           <div className="padding_36">
             <div className="login_input">
@@ -115,7 +129,7 @@ class Login extends Component {
             <div className="button_wrap">
               <button
                 type="Submit"
-                className="login_button"
+                className="login_button cursor_pointer"
                 onClick={() => {
                   this.handleLogin();
                 }}

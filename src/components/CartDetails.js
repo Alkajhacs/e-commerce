@@ -101,12 +101,6 @@ class CartDetails extends Component {
             "Content-Type": "application/json",
           },
         })
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
     }
   }
 
@@ -120,9 +114,6 @@ class CartDetails extends Component {
           cartCount: this.props.cartCount - 1,
         });
         this.fetchCartItemDetails()
-      })
-      .catch((error) => {
-        console.log(error)
       })
     }
   }

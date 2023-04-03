@@ -4,8 +4,11 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { updateAuthData } from "../actions/useractions";
 import { withRouter } from "../withRouter";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/common.css";
 import "../styles/signUp.css";
+import { validatePhonenumber, validateEmail } from "../actions/commonFunctions";
 
 class Signup extends Component {
   constructor(props) {
@@ -38,32 +41,67 @@ class Signup extends Component {
       userAddress,
       userRole,
     });
-    axios
+    if (
+      userName === "" ||
+      userPassword === "" ||
+      userEmail === "" ||
+      userPhonNo === "" ||
+      userAddress === "" ||
+      userRole === ""
+    ) {
+      toast.error("Please Enter all the fields",{
+        autoClose: 2000
+      })
+    } else if (!validateEmail(userEmail)) {
+      toast.error("Please Enter valid Email", {
+        autoClose: 2000,
+      });
+    } else if (!validatePhonenumber(userPhonNo)) {
+      toast.error("Please Enter valid Phone Number", {
+        autoClose: 2000,
+      });
+    } else {
+      axios
       .post("http://localhost:8000/api/register", data, {
         headers: {
           "Content-Type": "application/json",
         },
       })
       .then((response) => {
-        const { token = "", result: { role = "" } = {}, auth } = response.data;
+        const {
+          token = "",
+          result: {
+            userRole = "",
+            userId = "",
+            userName = "",
+            userAddress = "",
+            userEmail = "",
+          } = {},
+          auth,
+        } = response.data;
         localStorage.setItem("token", token);
-        localStorage.setItem("role", role);
+        localStorage.setItem("role", userRole);
+        localStorage.setItem("user_id", userId);
         this.setState(
           {
             isauthenticated: auth,
-            userRole: role,
+            userRole,
           },
           () => {
+            this.props.navigate("/e-commerce");
             this.props.updateAuthData({
               isauthenticated: auth,
-              userRole: role,
+              userRole,
+              userId,
+              userName,
+              userAddress,
+              userEmail,
+              phoneNumber: userPhonNo,
             });
           }
         );
-      })
-      .catch((error) => {
-        console.log(error);
       });
+    }
   };
 
   render() {
@@ -77,6 +115,7 @@ class Signup extends Component {
     return (
       <div className="common_bg padding_36">
         <div className=" sign_up">
+        <ToastContainer />
           <div className="padding_36 ">
             <div className="login_input">
               Enter Email * :
@@ -167,13 +206,10 @@ class Signup extends Component {
                 User
               </div>
             </div>
-            <div
-              className="button_wrap"
-              onClick={() => this.props.navigate("/e-commerce")}
-            >
+            <div className="button_wrap">
               <button
                 type="Submit"
-                className="login_button"
+                className="login_button cursor_pointer"
                 onClick={() => {
                   this.handleRegister();
                 }}
@@ -197,4 +233,5 @@ const mapDispatchToProps = (dispatch) => {
     updateAuthData: (data) => dispatch(updateAuthData(data)),
   };
 };
+
 export default withRouter(connect(null, mapDispatchToProps)(Signup));

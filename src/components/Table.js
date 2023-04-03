@@ -29,18 +29,20 @@ class Table extends Component {
               {Object.keys(eachRow).map((eachCell) => {
                 return <td className="prod_det_body">{eachRow[eachCell]}</td>;
               })}
-              <td>
-                <button
-                  className="add_product"
-                  onClick={() =>
-                    handleActionButton(
-                      isOrders ? eachRow?.order_id : eachRow?.user_id
-                    )
-                  }
-                >
-                  {isOrders ? "Cancel" : "Delete"}
-                </button>
-              </td>
+              {(isOrders ? eachRow?.order_status === "Confirmed" : header[header.length - 1] === "Action" )&& (
+                <td>
+                  <button
+                    className="add_product"
+                    onClick={() =>
+                      handleActionButton(
+                        isOrders ? eachRow?.order_id : eachRow?.user_id
+                      )
+                    }
+                  >
+                    {isOrders ? "Cancel" : "Delete"}
+                  </button>
+                </td>
+              )}
             </tr>
           );
         })}

@@ -25,7 +25,6 @@ class AllUsers extends Component {
   }
 
   handleDelete(userId) {
-    console.log("hello");
     axios
       .delete(`http://localhost:8000/api/deleteUser/${userId}`)
       .then((response) => {
@@ -44,8 +43,8 @@ class AllUsers extends Component {
     const { allUsers = [] } = this.state;
     const header = [
       "User Id",
-      "User Name",
       "User Mail",
+      "User Name",
       "User Phone Number",
       "Address",
       "User Role",

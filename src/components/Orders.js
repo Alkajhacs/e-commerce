@@ -13,15 +13,13 @@ export default class Orders extends Component {
   }
 
   componentDidMount() {
-    console.log("testing");
     this.fetchAllOrders();
   }
 
   fetchAllOrders() {
     const userId = localStorage.getItem("user_id");
     const userRole = localStorage.getItem("role");
-    console.log("hello");
-    if (userRole === "Admin") {
+    if (userRole === "User") {
       axios
         .get(`http://localhost:8000/api/getAllOrders/${userId}`)
         .then((response) => {
@@ -42,6 +40,7 @@ export default class Orders extends Component {
     axios
       .put(`http://localhost:8000/api/updateOrder/${orderId}`)
       .then((response) => {
+        this.fetchAllOrders();
         toast.success(response.data, {
           autoClose: 3000,
         });
@@ -56,6 +55,7 @@ export default class Orders extends Component {
   render() {
     const { allOrders = [] } = this.state;
     const header = [
+      "User Id",
       "Order Id",
       "Product Id",
       "Delivery Address",

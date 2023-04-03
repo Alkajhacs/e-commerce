@@ -13,9 +13,9 @@ import Feedback from './components/Feedback';
 import MyProfile from './components/MyProfile';
 import AllUsers from './components/AllUsers';
 import Orders from './components/Orders';
+import AllFeedback from './components/AllFeedback';
+import AllPayment from './components/AllPayment'
 
-//https://codesandbox.io/s/cleverprogrammersreact-challenge-amazon-clone-x35kd?file=/src/App.js
-//Alka@123
 
 function App() {
   return (
@@ -36,6 +36,8 @@ function App() {
           <Route path= '/feedback' element = {<Feedback/>}/>
           <Route path= '/allUsers' element = {<AllUsers/>}/>
           <Route path= '/allOrders' element = {<Orders/>}/>
+          <Route path= '/allFeedback' element = {<AllFeedback/>}/>
+          <Route path= '/allPayment' element = {<AllPayment/>}/>
         </Routes>
       </div>
     </Router>

@@ -116,26 +116,14 @@ class ProductDetails extends Component {
             "Content-Type": "application/json",
           },
         })
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
     } else {
-      data = JSON.stringify({ quantity: cartCount, prd_id, userId });
+      data = JSON.stringify({ quantity: prevCartCount + currentPrdCount, prd_id, userId });
       axios
         .post("http://localhost:8000/api/addCart", data, {
           headers: {
             "Content-Type": "application/json",
           },
         })
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
     }
   }
 

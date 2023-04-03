@@ -13,7 +13,6 @@
   
   .product__rating {
     display: flex;
-    align-items: center;
   }
   
   .prd_img {

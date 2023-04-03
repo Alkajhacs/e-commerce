@@ -1,36 +1,6 @@
 import { createStore } from "redux";
-import axios from "axios";
+import { fetchUserData } from "./actions/commonFunctions";
 
-let userData = {}
-
-function fetchUserData() {
-  const userId = localStorage.getItem("user_id");
-  if (userId) {
-    axios
-      .get(`http://localhost:8000/api/getuser/${userId}`)
-      .then((response) => {
-        userData = response.data
-        const { user_mail = "", user_name = "", address = "", user_role = "", phone_no = ""} = userData || {};
-        console.log(phone_no, "phone_no")
-        const initialState = {
-          isauthenticated: false,
-          userRole: user_role,
-          userId: userId,
-          userName: user_name,
-          userAddress: address,
-          allProducts: [],
-          cartCount: 0,
-          userEmail: user_mail,
-          phoneNumber: phone_no
-        };
-        userStore.dispatch({ type: "UPDATE_AUTH_DATA", payload: initialState });
-      })
-      .catch((error) => {
-        console.log(error);
-        userData = {}
-      });
-  }
-}
 fetchUserData();
 
 const initialState = {

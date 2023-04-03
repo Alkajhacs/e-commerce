@@ -20,7 +20,8 @@ export default class Feedback extends Component {
       userId,
       userFeedback,
     });
-    axios
+    if(userFeedback !== "") {
+      axios
       .post("http://localhost:8000/api/feedback", data, {
         headers: {
           "Content-Type": "application/json",
@@ -31,6 +32,11 @@ export default class Feedback extends Component {
           autoClose: 3000,
         });
       });
+    } else {
+      toast.error("Please enter Feedback",{
+        autoClose: 2000
+      })
+    }
   };
 
   render() {

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { withRouter } from "../withRouter";
 import { connect } from "react-redux";
-import DialogBox from "./DialogBox";
 import "../styles/payment.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -13,21 +12,11 @@ class PaymentPage extends Component {
     super(props);
     this.state = {
       paymentMethod: "",
-      cardHolder: "",
-      cardNumber: "",
-      cardExpiry: "",
-      cardCvv: "",
-      showConfirmDialog: false,
       userAddress: props.userAddress || "",
     };
-    this.handleClose = this.handleClose.bind(this);
   }
 
-  componentDidMount() {
-    this.fetchCardDetails();
-  }
-
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (prevProps.userAddress !== this.props.userAddress) {
       this.setState({
         userAddress: this.props.userAddress,
@@ -35,69 +24,39 @@ class PaymentPage extends Component {
     }
   }
 
-  fetchCardDetails() {
+  loadScript(src) {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  }
+
+  async handleConfirm(totalPrice = 0) {
+    const {
+      allCartProducts = [],
+      fromPage = "",
+      eachProdQuant = {},
+      currentPrdCount = 0,
+    } = this.props.location.state;
+    const { phoneNumber = "", userEmail = "", userName } = this.props;
+    const { userAddress = "", paymentMethod = "" } = this.state;
     const userId = localStorage.getItem("user_id") || "";
-    axios.get(`http://localhost:8000/api/card/${userId}`).then((response) => {
-      const cardDetails = response.data?.[0];
-      const {
-        card_number = "",
-        card_holder = "",
-        card_expiry = "",
-      } = cardDetails || {};
-      this.setState({
-        cardHolder: card_holder,
-        cardNumber: card_number,
-        cardExpiry: card_expiry,
-      });
-    });
-  }
-
-  handleClose() {
-    this.setState({
-      showConfirmDialog: false,
-    });
-  }
-  handleConfirmPayment() {
-    this.setState({ showConfirmDialog: true });
-  }
-
-  saveCardDetails() {
-    const userId = localStorage.getItem("user_id") || "";
-    const { cardHolder = "", cardNumber = "", cardExpiry = "" } = this.state;
-    const data = JSON.stringify({
-      card_user_id: userId,
-      cardHolder,
-      cardNumber,
-      cardExpiry,
-    });
-    axios
-      .post("http://localhost:8000/api/card", data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        toast.success(response.data, {
-          autoClose: 3000,
-        });
-      })
-      .catch((error) => {
-        toast.error(error, {
-          autoClose: 3000,
-        });
-      });
-  }
-
-  handleConfirm = (totalPrice = 0) => {
-    const { allCartProducts = [], eachProdQuant = {} } = this.props.location.state;
-    this.setState(
-      {
-        showConfirmDialog: false,
-      },
-      () => {
-        console.log(totalPrice);
-        const { userAddress = "" } = this.state;
-        const userId = localStorage.getItem("user_id") || "";
+    if(paymentMethod !== "" && userAddress !== "") {
+      const res = await this.loadScript(
+        "https://checkout.razorpay.com/v1/checkout.js"
+      );
+      if (!res) {
+        alert("Razorpay SDK failed to load...");
+        return;
+      }
+      const orderData = function (responseData) {
         const orderData = JSON.stringify({
           userOrdId: userId,
           totalPrice,
@@ -111,65 +70,96 @@ class PaymentPage extends Component {
             },
           })
           .then((response) => {
-            this.setEachOrderDetail(response.data.orderId);
-          });
-        this.props.navigate("/confimationPage", { state: { allCartProducts, eachProdQuant } });
-      }
-    );
-  };
-
-  setEachOrderDetail(orderId = "") {
-    const {
-      allCartProducts = [],
-      fromPage = "",
-      eachProdQuant = {},
-      currentPrdCount = 0,
-    } = this.props.location.state;
-    const userId = localStorage.getItem("user_id");
-    allCartProducts.map((el) => {
-      const { prd_id = "", price } = el;
-      const quantity =
-        fromPage === "cartDetail" ? eachProdQuant?.[prd_id] : currentPrdCount;
-      const orderItems = JSON.stringify({
-        orderId,
-        prodId: prd_id,
-        quantity,
-        pricePerItem: price,
-      });
-      axios
-        .post("http://localhost:8000/api/order_items", orderItems, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-        .then((response) => {
-          axios
-            .delete(`http://localhost:8000/api/cart/${prd_id}/${userId}`)
-            .then(() => {
-              this.props.setCartCount({
-                cartCount: this.props.cartCount - quantity,
+            // add order Items
+            allCartProducts.map((el) => {
+              const { prd_id = "", price } = el;
+              const quantity =
+                fromPage === "cartDetail"
+                  ? eachProdQuant?.[prd_id]
+                  : currentPrdCount;
+              const orderItems = JSON.stringify({
+                orderId: response.data.orderId,
+                prodId: prd_id,
+                quantity,
+                pricePerItem: price,
               });
-            })
-            .catch((error) => {
-              console.log(error);
+              axios
+                .post("http://localhost:8000/api/order_items", orderItems, {
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                .then((response) => {
+                  axios
+                    .delete(`http://localhost:8000/api/cart/${prd_id}/${userId}`)
+                    .then(() => {
+                      this.props.setCartCount({
+                        cartCount:
+                          this.props.cartCount > 1
+                            ? this.props.cartCount - quantity
+                            : 0,
+                      });
+                    })
+                  toast.success(response.data, {
+                    autoClose: 3000,
+                  });
+                });
             });
-          toast.success(response.data, {
-            autoClose: 3000,
+            // set payment details
+            if (paymentMethod === "onlinePayment") {
+              const paymentData = {
+                orderCreationId: response.data.orderId,
+                razorpayPaymentId: responseData.razorpay_payment_id,
+                amount: `₹ ${totalPrice}`,
+              };
+              axios.post(
+                `http://localhost:8000/api/payment/${userId}`,
+                JSON.stringify(paymentData),
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+            }
           });
+        this.props.navigate("/confimationPage", {
+          state: { allCartProducts, eachProdQuant },
         });
-    });
+      }.bind(this);
+  
+      const handler = function (responseData) {
+        orderData(responseData);
+      }.bind(this);
+  
+      if (paymentMethod === "onlinePayment") {
+        const options = {
+          key: "",
+          currency: "INR",
+          amount: totalPrice * 100,
+          name: "E-Commerce (Online Shopping)",
+          description: "Thanks for shopping with us!",
+          prefill: {
+            name: userName,
+            email: userEmail,
+            contact: phoneNumber,
+          },
+          handler: handler,
+        };
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.open();
+      } else {
+        orderData("");
+      }
+    } else {
+      toast.error(paymentMethod === "" ? "Please select payment method" : "Please Enter delivery address",{
+        autoClose: 3000
+      })
+    }
   }
 
   render() {
-    const {
-      paymentMethod = "",
-      cardHolder = "",
-      cardNumber = "",
-      cardExpiry = "",
-      cardCvv = "",
-      showConfirmDialog = false,
-      userAddress = this.props.userAddress || "",
-    } = this.state;
+    const { userAddress = "" } = this.state;
     const {
       allCartProducts = [],
       eachProdQuant = {},
@@ -242,62 +232,6 @@ class PaymentPage extends Component {
               Cash On Delivery
             </div>
           </div>
-          {paymentMethod === "onlinePayment" && (
-            <div>
-              <div className="login_input">
-                Enter CardHolder Name * :
-                <input
-                  className="signup_input"
-                  type="text"
-                  value={cardHolder}
-                  onChange={(event) =>
-                    this.setState({ cardHolder: event.target.value })
-                  }
-                  autoComplete="off"
-                  required
-                ></input>
-              </div>
-              <div className="login_input">
-                Enter Card Number * :
-                <input
-                  className="signup_input"
-                  type="text"
-                  value={cardNumber}
-                  onChange={(event) =>
-                    this.setState({ cardNumber: event.target.value })
-                  }
-                  autoComplete="off"
-                  required
-                ></input>
-              </div>
-              <div className="login_input">
-                Choose Expire date of card * :
-                <input
-                  className="signup_input"
-                  type="text"
-                  value={cardExpiry}
-                  onChange={(event) =>
-                    this.setState({ cardExpiry: event.target.value })
-                  }
-                  autoComplete="off"
-                  required
-                ></input>
-              </div>
-              <div className="login_input">
-                Enter Card CVV * :
-                <input
-                  className="signup_input"
-                  type="text"
-                  value={cardCvv}
-                  onChange={(event) =>
-                    this.setState({ cardCvv: event.target.value })
-                  }
-                  autoComplete="off"
-                  required
-                ></input>
-              </div>
-            </div>
-          )}
           <hr></hr>
           <div className="login_input">
             Delivery Address * :
@@ -312,36 +246,14 @@ class PaymentPage extends Component {
             ></textarea>
           </div>
           <div className="flex_justify_between">
-            {paymentMethod === "onlinePayment" && (
-              <button
-                className="add_product"
-                onClick={() => {
-                  this.saveCardDetails();
-                }}
-              >
-                Save Card Details
-              </button>
-            )}
             <button
               className="add_product"
-              onClick={() => this.handleConfirmPayment()}
+              onClick={() => this.handleConfirm(totalPrice)}
             >
-              Confirm Payment
+              Confirm Order
             </button>
           </div>
         </div>
-        {showConfirmDialog && (
-          <DialogBox
-            showConfirmDialog={showConfirmDialog}
-            handleClose={this.handleClose}
-            title="Confirm payment"
-            content={`Do you want to confirm your payment of Rs ${totalPrice}`}
-            showCancel={true}
-            confirmButtonText="Confirm"
-            handleConfirm={this.handleConfirm}
-            totalPrice={totalPrice}
-          />
-        )}
       </div>
     );
   }
@@ -350,6 +262,9 @@ const mapStateToProps = (state) => {
   return {
     cartCount: state.cartCount,
     userAddress: state.userAddress,
+    phoneNumber: state.phoneNumber,
+    userEmail: state.userEmail,
+    userName: state.userName,
   };
 };
 

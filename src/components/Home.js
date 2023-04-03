@@ -1,27 +1,30 @@
 import React, { Component } from "react";
 import { withRouter } from "../withRouter";
-import {connect} from "react-redux"; 
+import { connect } from "react-redux";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import "../styles/home.css";
+import DialogBox from "./DialogBox";
 
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      allProducts: props.allProducts?.length ? props.allProducts : []
+      allProducts: props.allProducts?.length ? props.allProducts : [],
+      prdId: "",
     };
+    this.dialogBoxRef = React.createRef();
   }
   componentDidMount() {
     this.fetchProducts();
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps?.allProducts !== this.props?.allProducts){
+    if (prevProps?.allProducts !== this.props?.allProducts) {
       this.setState({
-        allProducts: this.props.allProducts
-      })
+        allProducts: this.props.allProducts,
+      });
     }
   }
   fetchProducts() {
@@ -30,7 +33,6 @@ class Home extends Component {
         allProducts: response.data,
       });
     });
-
   }
 
   handleAdd(eachProduct) {
@@ -38,21 +40,40 @@ class Home extends Component {
   }
 
   handleEdit(eachProduct) {
-    this.props.navigate("/addProduct", { state: {...eachProduct, isEdit: true} });
+    this.props.navigate("/addProduct", {
+      state: { ...eachProduct, isEdit: true },
+    });
   }
 
-  handleDelete(prdId) {
+  handleConfirm = (prdId) => {
     try {
-      const response = axios.delete(`http://localhost:8000/api/product/${prdId}`);
-      console.log(response.data);
+      axios.delete(`http://localhost:8000/api/product/${prdId}`)
+      .then((response) => {
+        this.setState({
+          showConfirmDialog: false
+        })
+      })
     } catch (error) {
       console.error(error);
     }
-  }
+  };
+
+  handleDeleteIcon = (prdId) => {
+    this.setState({
+      showConfirmDialog: true,
+      prdId,
+    });
+  };
+
+  handleClose = () => {
+    this.setState({
+      showConfirmDialog: false,
+    });
+  };
 
   render() {
-    const { allProducts = [] } = this.state;
-    const {userRole = ""} = this.props;
+    const { allProducts = [], showConfirmDialog = false, prdId } = this.state;
+    const userRole = localStorage.getItem("role");
     return (
       <div className="home">
         <div className="home__container">
@@ -61,11 +82,17 @@ class Home extends Component {
             src="https://images-eu.ssl-images-amazon.com/images/G/02/digital/video/merch2016/Hero/Covid19/Generic/GWBleedingHero_ENG_COVIDUPDATE__XSite_1500x600_PV_en-GB._CB428684220_.jpg"
             alt=""
           />
-          {userRole === "Admin" && <div className="button_wrap">
-            <button type="Submit" className="add_product" onClick={() => this.props.navigate("/addProduct")}>
-              Add a Product
-            </button>
-          </div>}
+          {userRole === "Admin" && (
+            <div className="button_wrap cursor_pointer">
+              <button
+                type="Submit"
+                className="add_product"
+                onClick={() => this.props.navigate("/addProduct")}
+              >
+                Add a Product
+              </button>
+            </div>
+          )}
           <div className="home__row">
             {allProducts.map((eachProduct) => {
               const {
@@ -106,20 +133,42 @@ class Home extends Component {
                     >
                       View Details
                     </button>
-                    {userRole === "Admin" && <div className="admin_button">
-                      <div className="product__rating cursor_pointer" onClick={() => this.handleEdit(eachProduct)}>
-                        Edit &nbsp;&nbsp;<EditIcon />
+                    {userRole === "Admin" && (
+                      <div className="admin_button">
+                        <div
+                          className="product__rating cursor_pointer"
+                          onClick={() => this.handleEdit(eachProduct)}
+                        >
+                          Edit &nbsp;&nbsp;
+                          <EditIcon />
+                        </div>
+                        <div
+                          className="product__rating cursor_pointer"
+                          onClick={() => this.handleDeleteIcon(prd_id)}
+                        >
+                          Delete &nbsp;&nbsp;
+                          <DeleteIcon />
+                        </div>
                       </div>
-                      <div className="product__rating cursor_pointer" onClick={() => this.handleDelete(prd_id)}>
-                        Delete &nbsp;&nbsp;<DeleteIcon />
-                      </div>
-                    </div>}
+                    )}
                   </div>
                 </div>
               );
             })}
           </div>
         </div>
+        {showConfirmDialog && (
+          <DialogBox
+            ref={this.dialogBoxRef}
+            showConfirmDialog={showConfirmDialog}
+            handleClose={this.handleClose}
+            content={`Do you want to delete the product ? `}
+            showCancel={true}
+            confirmButtonText="Confirm"
+            handleConfirm={this.handleConfirm}
+            confirmParam={prdId}
+          />
+        )}
       </div>
     );
   }
@@ -127,7 +176,7 @@ class Home extends Component {
 const mapStateToProps = (state) => {
   return {
     allProducts: state.allProducts,
-    userRole: state.userRole
+    userRole: state.userRole,
   };
 };
 export default withRouter(connect(mapStateToProps)(Home));

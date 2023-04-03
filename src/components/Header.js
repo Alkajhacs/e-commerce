@@ -28,7 +28,6 @@ class Header extends Component {
           const totalcount = response.data.reduce((a, b) => {
             return a + b.quantity;
           }, 0);
-          console.log(response.data);
           this.props.setCartCount({
             cartCount: totalcount,
           });
@@ -47,9 +46,6 @@ class Header extends Component {
             allProducts,
           });
         })
-        .catch((error) => {
-          console.log(error);
-        });
     }
   }
 
@@ -67,18 +63,16 @@ class Header extends Component {
       .then((response) => {
         const allProducts = response.data;
         this.props.getSearchData({
-          allProducts,
+          allProducts
         });
       })
-      .catch((error) => {
-        console.log(error);
-      });
   }
 
   render() {
     const { userName = "", cartCount = 0 } = this.props;
     const { searchedItem = "" } = this.state;
     const isauthenticated = localStorage.getItem("token") || false;
+    const isAdmin = localStorage.getItem("role") === "Admin";
     return (
       <div className="header">
         <img
@@ -150,13 +144,59 @@ class Header extends Component {
               )}
             </span>
           </div>
-          <div
+          {isauthenticated && <div
             className="header__option cursor_pointer"
             onClick={() => this.props.navigate("/allOrders")}
           >
             Orders
-          </div>
-          <div
+          </div>}
+          {isauthenticated && <div
+            className="header__option cursor_pointer"
+            onClick={() => {
+              const isauthenticated = localStorage.getItem("token") || false;
+              if (isauthenticated) {
+                this.props.navigate("/myProfile", {
+                  state: { fromPage: "header" },
+                });
+              } else {
+                this.props.navigate("/login");
+              }
+            }}
+          >
+            My Profile
+          </div>}
+          {isauthenticated && <div
+            className="header__option cursor_pointer"
+            onClick={() => {
+              const isauthenticated = localStorage.getItem("token") || false;
+              if (isauthenticated) {
+                this.props.navigate("/feedback");
+              } else {
+                this.props.navigate("/login");
+              }
+            }}
+          >
+            Feedback
+          </div>}
+          {isauthenticated && isAdmin && <div
+            className="header__option cursor_pointer"
+            onClick={() => this.props.navigate("/allUsers")}
+          >
+            All Users
+          </div>}
+          {isauthenticated && isAdmin && <div
+            className="header__option cursor_pointer"
+            onClick={() => this.props.navigate("/allFeedback")}
+          >
+            All Feedback
+          </div>}
+          {isauthenticated && isAdmin && <div
+            className="header__option cursor_pointer"
+            onClick={() => this.props.navigate("/allPayment")}
+          >
+            All Payments
+          </div>}
+          {isauthenticated && <div
             className="header__optionBasket cursor_pointer"
             onClick={() => {
               const isauthenticated = localStorage.getItem("token") || false;
@@ -171,41 +211,7 @@ class Header extends Component {
             <span className="header__optionLineTwo header__BasketCount">
               {cartCount}
             </span>
-          </div>
-          <div
-            className="header__option cursor_pointer"
-            onClick={() => {
-              const isauthenticated = localStorage.getItem("token") || false;
-              if (isauthenticated) {
-                this.props.navigate("/myProfile", {
-                  state: { fromPage: "header" },
-                });
-              } else {
-                this.props.navigate("/login");
-              }
-            }}
-          >
-            My Profile
-          </div>
-          <div
-            className="header__option cursor_pointer"
-            onClick={() => {
-              const isauthenticated = localStorage.getItem("token") || false;
-              if (isauthenticated) {
-                this.props.navigate("/feedback");
-              } else {
-                this.props.navigate("/login");
-              }
-            }}
-          >
-            Feedback
-          </div>
-          <div
-            className="header__option cursor_pointer"
-            onClick={() => this.props.navigate("/allUsers")}
-          >
-            All Users
-          </div>
+          </div>}
         </div>
       </div>
     );
