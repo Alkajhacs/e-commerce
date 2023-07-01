@@ -14,7 +14,12 @@ import MyProfile from './components/MyProfile';
 import AllUsers from './components/AllUsers';
 import Orders from './components/Orders';
 import AllFeedback from './components/AllFeedback';
-import AllPayment from './components/AllPayment'
+import AllPayment from './components/AllPayment';
+import OrderUpdate from './components/OrderUpdate';
+import OrderTrack from './components/OrderTrack';
+import GiveReview from './components/GiveReview';
+import CheckReview from './components/CheckReview';
+import AllReturns from './components/AllReturns';
 
 
 function App() {
@@ -38,6 +43,11 @@ function App() {
           <Route path= '/allOrders' element = {<Orders/>}/>
           <Route path= '/allFeedback' element = {<AllFeedback/>}/>
           <Route path= '/allPayment' element = {<AllPayment/>}/>
+          <Route path= '/orderUpdate' element = {<OrderUpdate/>}/>
+          <Route path = '/orderTrack' element = {<OrderTrack/>}/>
+          <Route path = '/giveReview' element = {<GiveReview/>}/>
+          <Route path = '/checkReview' element = {<CheckReview/>}/>
+          <Route path = '/allReturns' element = {<AllReturns/>}/>
         </Routes>
       </div>
     </Router>

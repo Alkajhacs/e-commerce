@@ -134,7 +134,7 @@ class PaymentPage extends Component {
   
       if (paymentMethod === "onlinePayment") {
         const options = {
-          key: "",
+          key: "rzp_test_PRZwktsAf5I2OS",
           currency: "INR",
           amount: totalPrice * 100,
           name: "E-Commerce (Online Shopping)",

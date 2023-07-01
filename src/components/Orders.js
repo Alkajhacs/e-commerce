@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
 import Table from "./Table";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 export default class Orders extends Component {
   constructor(props) {
@@ -36,22 +34,6 @@ export default class Orders extends Component {
     }
   }
 
-  handleCancelOrder(orderId) {
-    axios
-      .put(`http://localhost:8000/api/updateOrder/${orderId}`)
-      .then((response) => {
-        this.fetchAllOrders();
-        toast.success(response.data, {
-          autoClose: 3000,
-        });
-      })
-      .catch((error) => {
-        toast.error(error, {
-          autoClose: 3000,
-        });
-      });
-  }
-
   render() {
     const { allOrders = [] } = this.state;
     const header = [
@@ -63,12 +45,12 @@ export default class Orders extends Component {
       "Quantity",
       "Price Per Item",
       "Total Price",
+      "Product",
       "Order Status",
       "Action",
     ];
     return (
       <div className="common_bg padding_36">
-        <ToastContainer />
         <Table
           header={header}
           tableData={allOrders}

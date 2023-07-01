@@ -77,8 +77,8 @@ class Header extends Component {
       <div className="header">
         <img
           className="header__logo"
-          src="http://pngimg.com/uploads/amazon/amazon_PNG11.png"
-          alt=""
+          src="https://res.cloudinary.com/dgcciqtbn/image/upload/v1681001027/logo_fqtaoe.png"
+          alt="logo"
         />
         <div className="header__search">
           <input
@@ -88,6 +88,7 @@ class Header extends Component {
             onChange={(event) =>
               this.setState({ searchedItem: event.target.value })
             }
+            autoComplete={false}
           />
           <ClearIcon
             className="clear__Icon cursor_pointer"
@@ -196,6 +197,12 @@ class Header extends Component {
           >
             All Payments
           </div>}
+          {isauthenticated && isAdmin && <div
+            className="header__option cursor_pointer"
+            onClick={() => this.props.navigate("/allReturns")}
+          >
+            Return Requests
+          </div>}
           {isauthenticated && <div
             className="header__optionBasket cursor_pointer"
             onClick={() => {
@@ -212,6 +219,7 @@ class Header extends Component {
               {cartCount}
             </span>
           </div>}
+          
         </div>
       </div>
     );

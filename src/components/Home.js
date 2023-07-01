@@ -47,12 +47,13 @@ class Home extends Component {
 
   handleConfirm = (prdId) => {
     try {
-      axios.delete(`http://localhost:8000/api/product/${prdId}`)
-      .then((response) => {
-        this.setState({
-          showConfirmDialog: false
-        })
-      })
+      axios
+        .delete(`http://localhost:8000/api/product/${prdId}`)
+        .then((response) => {
+          this.setState({
+            showConfirmDialog: false,
+          });
+        });
     } catch (error) {
       console.error(error);
     }
@@ -76,12 +77,18 @@ class Home extends Component {
     const userRole = localStorage.getItem("role");
     return (
       <div className="home">
-        <div className="home__container">
+        <div>
           <img
             className="home__image"
-            src="https://images-eu.ssl-images-amazon.com/images/G/02/digital/video/merch2016/Hero/Covid19/Generic/GWBleedingHero_ENG_COVIDUPDATE__XSite_1500x600_PV_en-GB._CB428684220_.jpg"
-            alt=""
+            src="https://res.cloudinary.com/dgcciqtbn/image/upload/c_scale,h_650,w_1475/v1680999953/homepage_flwjdj.png"
+            alt="homepage"
           />
+          <div className="justify_center contact_us ">
+            <div className="w_50 flex_justify_between">
+              <div>Contact us : 8930345678</div>
+              <div>Mail to : ecomfy@gmail.com</div>
+            </div>
+          </div>
           {userRole === "Admin" && (
             <div className="button_wrap cursor_pointer">
               <button

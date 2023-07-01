@@ -99,7 +99,7 @@ class CartDetails extends Component {
         .put(`http://localhost:8000/api/addCart/${prd_id}/${userId}`, data, {
           headers: {
             "Content-Type": "application/json",
-          },
+          }
         })
     }
   }
